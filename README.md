@@ -1,6 +1,6 @@
 # Atelier Terra — Artisanal Ceramics & Cozy Home Living
 
--A high-aesthetic Japandi / Scandinavian ceramic e-commerce platform built with Python & Django.
+- A high-aesthetic Japandi / Scandinavian ceramic e-commerce platform built with Python & Django.
 - Inspired by warm morning light, hand-pleated paper lamps, tactile stoneware, and tranquil creative workspaces.
 
 ---
