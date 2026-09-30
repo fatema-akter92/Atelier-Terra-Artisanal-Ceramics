@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Style My Cozy Nook | Virtual Room & Desk Styler | Atelier Terra{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Cozy Nook Visual Room Canvas */
+    .nook-canvas-container {
+        position: relative;
+        width: 100%;
+        min-height: 520px;
+        background-color: #FAF5EE;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #E5DCCE;
+        box-shadow: 0 15px 35px -10px rgba(70, 50, 35, 0.12);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    /* Off-white painted brick wall background */
+    .nook-brick-wall {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 68%;
+        background-color: #F8F5EE;
+        background-image: 
+            linear-gradient(rgba(215, 205, 190, 0.22) 1.5px, transparent 1.5px),
+            linear-gradient(90deg, rgba(215, 205, 190, 0.22) 1.5px, transparent 1.5px);
+        background-size: 80px 24px, 80px 24px;
+        background-position: 0 0, 40px 12px;
+    }
+
+    /* Soft Morning Window Light Gradient from the right side */
+    .nook-window-light {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 65%;
+        height: 100%;
+        background: radial-gradient(circle at 90% 25%, rgba(255, 255, 240, 0.75) 0%, rgba(255, 245, 220, 0.2) 60%, transparent 100%);
+        pointer-events: none;
+    }
+
+    /* Light Honey Oak Desk Surface */
+    .nook-desk-surface {
+        position: relative;
+        height: 32%;
+        width: 100%;
+        background: linear-gradient(180deg, #E2D1BD 0%, #D4BEA5 15%, #BAA287 100%);
+        border-top: 2px solid #EFE4D6;
+        box-shadow: inset 0 8px 16px rgba(0,0,0,0.06);
+        z-index: 10;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        padding-bottom: 20px;
+    }
+
+    /* Interactive Drop / Placement Slots */
+    .nook-slot {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .nook-slot.wall-slot {
+        position: absolute;
+        top: 30px;
+        left: 20%;
+        width: 180px;
+        height: 220px;
+        z-index: 5;
+    }
+
+    .nook-slot.lamp-slot {
+        width: 240px;
+        height: 380px;
+        margin-bottom: -15px;
+        z-index: 15;
+    }
+
+    .nook-slot.vase-slot {
+        width: 160px;
+        height: 250px;
+        margin-bottom: -10px;
+        z-index: 14;
+    }
+
+    .nook-slot.cup-slot {
+        width: 140px;
+        height: 220px;
+        margin-bottom: -10px;
+        z-index: 14;
+    }
+
+    .nook-slot.bowl-slot {
+        width: 150px;
+        height: 180px;
+        margin-bottom: -10px;
+        z-index: 13;
+    }
+
+    /* Slot Empty Placeholder Badge */
+    .empty-slot-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #8C7E72;
+        background-color: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(4px);
+        padding: 6px 14px;
+        border-radius: 9999px;
+        border: 1.5px dashed #B8AA9A;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .empty-slot-label:hover {
+        background-color: white;
+        border-color: #C4704F;
+        color: #C4704F;
+        transform: scale(1.04);
+    }
+
+    /* Placed item presentation */
+    .placed-item-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: dropIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes dropIn {
+        from { opacity: 0; transform: translateY(-25px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .placed-img {
+        max-height: 320px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 15px 20px rgba(60, 45, 30, 0.28));
+    }
+
+    .wall-slot .placed-img {
+        max-height: 210px;
+    }
+
+    .placed-tag {
+        position: absolute;
+        bottom: -22px;
+        background-color: rgba(44, 38, 33, 0.88);
+        color: #F8F4EE;
+        font-size: 0.7rem;
+        padding: 2px 10px;
+        border-radius: 9999px;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .remove-slot-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background-color: #D65A4A;
+        color: white;
+        border: 2px solid white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease;
+    }
+
+    .remove-slot-btn:hover {
+        transform: scale(1.15);
+    }
+
+    /* Item Card Selection */
+    .nook-item-card {
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .nook-item-card.selected {
+        border-color: #C4704F !important;
+        background-color: #FAF3ED !important;
+        box-shadow: 0 0 0 2px #C4704F;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <div class="flex items-center gap-2 text-xs text-stone-500 mb-2">
+                    <a href="{% url 'core:home' %}" class="hover:text-terracotta">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    <span class="text-espresso font-medium">Style My Cozy Nook</span>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 tracking-wider uppercase mb-1">
+                    <i class="fa-solid fa-couch"></i> Interactive Room Visualizer
+                </span>
+                <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-espresso font-semibold">Style My Morning Desk Nook</h1>
+            </div>
+            <div class="text-right">
+                <span class="badge-pill badge-terracotta text-xs">
+                    <i class="fa-solid fa-tag mr-1"></i> Automatic 15% Curated Bundle Discount
+                </span>
+                <p class="text-xs text-stone-500 mt-1">Place 2 or more pieces to unlock the complete look discount</p>
+            </div>
+        </div>
+
+        <!-- The Room Canvas Stage -->
+        <div class="nook-canvas-container mb-12">
+            <!-- Off-white brick wall (matching user photo) -->
+            <div class="nook-brick-wall"></div>
+            <!-- Window sunlight glow -->
+            <div class="nook-window-light"></div>
+
+            <!-- Wall Slot: Wallmate or Tapestry -->
+            <div id="slot-wallmate" class="nook-slot wall-slot">
+                <span class="empty-slot-label"><i class="fa-solid fa-plus"></i> Place Wallmate</span>
+            </div>
+
+            <!-- Oak Tabletop Surface with 4 desktop item slots -->
+            <div class="nook-desk-surface">
+                <!-- Slot 1: Cylindrical Pencil Cup / Tool Holder (from photo) -->
+                <div id="slot-cup" class="nook-slot cup-slot">
+                    <span class="empty-slot-label"><i class="fa-solid fa-plus"></i> Place Pencil Cup</span>
+                </div>
+
+                <!-- Slot 2: The Pleated Solstice Table Lamp (Hero item from photo) -->
+                <div id="slot-lamp" class="nook-slot lamp-slot">
+                    <span class="empty-slot-label"><i class="fa-solid fa-plus"></i> Place Ambient Lamp</span>
+                </div>
+
+                <!-- Slot 3: Aura Fluted Bud Vase with botanical sprig (from photo) -->
+                <div id="slot-vase" class="nook-slot vase-slot">
+                    <span class="empty-slot-label"><i class="fa-solid fa-plus"></i> Place Bud Vase</span>
+                </div>
+
+                <!-- Slot 4: Tableware Accent / Bowl -->
+                <div id="slot-bowl" class="nook-slot bowl-slot">
+                    <span class="empty-slot-label"><i class="fa-solid fa-plus"></i> Place Accent Bowl</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Bundle Summary & Harmony Bar -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-md mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Harmony Meter -->
+                <div class="lg:col-span-5 space-y-3">
+                    <div class="flex items-center justify-between text-xs font-semibold">
+                        <span class="text-stone-500 uppercase tracking-wider">Aesthetic Harmony Score</span>
+                        <span id="harmony-percentage" class="text-terracotta">94% Japandi Harmony</span>
+                    </div>
+                    <div class="w-full bg-stone-100 rounded-full h-3 overflow-hidden">
+                        <div id="harmony-progress" class="bg-gradient-to-r from-amber-400 to-terracotta h-3 rounded-full transition-all duration-500" style="width: 94%;"></div>
+                    </div>
+                    <p class="text-xs text-stone-500">
+                        The Pleated Lamp, Bud Vase, and Ceramic Desk Cup harmonize natural textures and morning light.
+                    </p>
+                </div>
+
+                <!-- Bundle Pricing -->
+                <div class="lg:col-span-4 flex items-center justify-around border-t lg:border-t-0 lg:border-l lg:border-r border-stone-100 py-4 lg:py-0 px-4">
+                    <div>
+                        <span class="text-xs text-stone-400 block">Subtotal</span>
+                        <span id="nook-subtotal" class="font-medium text-stone-600 line-through text-lg">$231.00</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-terracotta font-semibold block">Bundle Discount</span>
+                        <span id="nook-discount" class="text-xs font-bold text-terracotta bg-terracotta/10 px-2.5 py-1 rounded-full">-$34.65 (15% OFF)</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-stone-500 block">Look Total</span>
+                        <span id="nook-total" class="font-serif text-3xl font-bold text-espresso">$196.35</span>
+                    </div>
+                </div>
+
+                <!-- Add to Basket Form -->
+                <div class="lg:col-span-3 text-right">
+                    <form action="{% url 'atelier:add_nook_bundle' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_ids" id="bundle-product-ids" value="[]">
+                        <button type="submit" id="btn-add-bundle" class="btn-primary w-full py-4 text-base">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span>Add Full Room Look</span>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Curated Decor Elements Selector Drawer -->
+        <div>
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-terracotta tracking-wider uppercase">Decor Wardrobe</span>
+                    <h3 class="font-serif text-2xl text-espresso font-semibold mt-0.5">Click any piece to place or swap in your room</h3>
+                </div>
+            </div>
+
+            <!-- Categories Tabs -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {% for item in all_nook_items %}
+                <div class="nook-item-card bg-white p-3 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                     data-id="{{ item.id }}"
+                     data-slot="{{ item.nook_layer_type }}"
+                     data-name="{{ item.name }}"
+                     data-price="{{ item.price }}"
+                     data-img="{% if item.image %}{{ item.image.url }}{% else %}{% static 'images/hero_pleated_lamp.jpg' %}{% endif %}">
+                    <div class="aspect-square bg-sand/60 rounded-lg overflow-hidden mb-3 relative flex items-center justify-center p-2">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="max-h-full max-w-full object-contain">
+                        {% else %}
+                        <img src="{% static 'images/hero_pleated_lamp.jpg' %}" alt="{{ item.name }}" class="max-h-full max-w-full object-contain">
+                        {% endif %}
+                        <span class="absolute top-2 left-2 bg-stone-900/80 text-white text-[10px] px-2 py-0.5 rounded-full capitalize">
+                            {{ item.nook_layer_type }}
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="font-serif font-semibold text-sm text-espresso line-clamp-1">{{ item.name }}</h4>
+                        <div class="flex items-center justify-between mt-1 text-xs">
+                            <span class="font-bold text-espresso">${{ item.price }}</span>
+                            <span class="text-terracotta font-medium hover:underline">Tap to Place</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/nook_builder.js' %}"></script>
+{% endblock %}

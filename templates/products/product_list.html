@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ceramic Collection & Home Decor | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container">
+        
+        <!-- Header & Breadcrumbs -->
+        <div class="mb-8">
+            <div class="flex items-center gap-2 text-xs text-stone-500 mb-2">
+                <a href="{% url 'core:home' %}" class="hover:text-terracotta">Home</a>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <a href="{% url 'products:product_list' %}" class="hover:text-terracotta">Shop</a>
+                {% if category %}
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <span class="text-espresso font-medium">{{ category.name }}</span>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-espresso font-semibold">
+                        {% if category %}{{ category.name }}{% else %}The Ceramic Collection{% endif %}
+                    </h1>
+                    <p class="text-stone-500 text-sm mt-1 max-w-xl">
+                        {% if category %}
+                            {{ category.description }}
+                        {% else %}
+                            Handcrafted stoneware, fluted vases, pleated architectural lamps, and artisanal homeware fired at 1280°C.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Interactive shortcuts -->
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'atelier:studio' %}" class="action-btn text-xs bg-white text-terracotta border-terracotta/30 hover:bg-terracotta hover:text-white">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Custom Atelier</span>
+                    </a>
+                    <a href="{% url 'atelier:cozy_nook_builder' %}" class="action-btn text-xs bg-stone-900 text-white hover:bg-stone-800 border-stone-900">
+                        <i class="fa-solid fa-couch text-amber-400"></i>
+                        <span>Style Nook</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-sm mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <!-- Category Pills -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                <a href="{% url 'products:product_list' %}" 
+                   class="px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors {% if not category %}bg-stone-900 text-white{% else %}bg-sand text-stone-700 hover:bg-stone-200{% endif %}">
+                    All Pieces ({{ total_count }})
+                </a>
+                {% for cat in categories %}
+                <a href="{% url 'products:product_list_by_category' cat.slug %}" 
+                   class="px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors {% if category and category.slug == cat.slug %}bg-stone-900 text-white{% else %}bg-sand text-stone-700 hover:bg-stone-200{% endif %}">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Search & Sort Controls -->
+            <form method="GET" class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-grow md:w-56">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search vases, lamps..." 
+                           class="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-sand/60 border border-stone-200 focus:outline-none focus:border-terracotta">
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-stone-400 text-xs"></i>
+                </div>
+
+                <select name="sort" onchange="this.form.submit()" class="text-xs bg-sand/60 border border-stone-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-terracotta">
+                    <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
+                    <option value="bestseller" {% if current_sort == 'bestseller' %}selected{% endif %}>Bestsellers</option>
+                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                </select>
+            </form>
+
+        </div>
+
+        <!-- Products Grid -->
+        {% if products %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for product in products %}
+            <div class="product-card group">
+                <div class="card-image-wrap">
+                    {% if product.badge %}
+                    <div class="card-badge-top">
+                        <span class="badge-pill badge-terracotta">{{ product.badge }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'products:toggle_wishlist' product.id %}" class="card-wishlist-top" title="Add to Wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                    {% endif %}
+                </div>
+
+                <div class="card-content">
+                    <div class="flex items-center justify-between card-category">
+                        <span>{{ product.category.name }}</span>
+                        <span class="text-amber-600 flex items-center gap-1 font-sans">
+                            <i class="fa-solid fa-star text-[11px]"></i> {{ product.average_rating }}
+                        </span>
+                    </div>
+
+                    <h3 class="card-title font-serif">
+                        <a href="{{ product.get_absolute_url }}" class="hover:text-terracotta transition-colors">{{ product.name }}</a>
+                    </h3>
+
+                    <p class="card-tagline">{{ product.tagline }}</p>
+
+                    <div class="card-bottom">
+                        <div class="card-price">
+                            <span>${{ product.price }}</span>
+                            {% if product.compare_at_price %}
+                            <span class="compare-price">${{ product.compare_at_price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- 1-Click Quick Add Form -->
+                        <form action="{% url 'cart:cart_add' product.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-9 h-9 rounded-full bg-stone-900 text-white flex items-center justify-center hover:bg-terracotta transition-colors shadow-sm" title="Add to Basket">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20 bg-white rounded-2xl border border-stone-200 p-8">
+            <div class="w-16 h-16 rounded-full bg-sand text-stone-400 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3 class="font-serif text-2xl text-espresso font-semibold mb-2">No ceramic pieces found</h3>
+            <p class="text-stone-500 text-sm max-w-md mx-auto mb-6">
+                We couldn't find anything matching your search criteria. Try a different keyword or explore all collections.
+            </p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary">Browse All Pieces</a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

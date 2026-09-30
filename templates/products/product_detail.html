@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Atelier Terra Ceramics{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-sand/20 border-b border-stone-200">
+    <div class="atelier-container">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-stone-500 mb-8">
+            <a href="{% url 'core:home' %}" class="hover:text-terracotta">Home</a>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <a href="{% url 'products:product_list' %}" class="hover:text-terracotta">Shop</a>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <a href="{% url 'products:product_list_by_category' product.category.slug %}" class="hover:text-terracotta">{{ product.category.name }}</a>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <span class="text-espresso font-medium">{{ product.name }}</span>
+        </div>
+
+        <!-- Product Hero Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20">
+            
+            <!-- Left: High-Res Photography Gallery -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="bg-white p-3 rounded-2xl border border-stone-200 shadow-md overflow-hidden relative group">
+                    {% if product.badge %}
+                    <span class="absolute top-6 left-6 z-10 badge-pill badge-terracotta shadow-sm">
+                        {{ product.badge }}
+                    </span>
+                    {% endif %}
+
+                    {% if product.image %}
+                    <img id="main-product-image" src="{{ product.image.url }}" alt="{{ product.name }}" 
+                         class="w-full h-auto max-h-[640px] rounded-xl object-contain mx-auto bg-sand/30">
+                    {% endif %}
+                </div>
+
+                <!-- Trust Guarantee Bar below image -->
+                <div class="grid grid-cols-3 gap-4 text-center p-4 bg-white rounded-xl border border-stone-200 text-xs text-stone-600">
+                    <div>
+                        <i class="fa-solid fa-fire text-terracotta mb-1 block text-sm"></i>
+                        <span class="font-medium text-espresso">{{ product.firing_temperature }}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-box text-terracotta mb-1 block text-sm"></i>
+                        <span class="font-medium text-espresso">Biodegradable Packing</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-shield-halved text-terracotta mb-1 block text-sm"></i>
+                        <span class="font-medium text-espresso">Breakage Replacement</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Details, Ordering & Artisan Specs -->
+            <div class="lg:col-span-5 bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                
+                <div>
+                    <span class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1">
+                        {{ product.category.name }}
+                    </span>
+                    <h1 class="font-serif text-3xl sm:text-4xl text-espresso font-semibold mb-2">
+                        {{ product.name }}
+                    </h1>
+                    <p class="text-stone-500 text-sm italic">{{ product.tagline }}</p>
+
+                    <!-- Rating -->
+                    <div class="flex items-center gap-3 mt-3 text-xs">
+                        <div class="flex items-center text-amber-500">
+                            {% for i in "12345"|make_list %}
+                            <i class="fa-solid fa-star"></i>
+                            {% endfor %}
+                        </div>
+                        <span class="font-semibold text-stone-700">{{ product.average_rating }}</span>
+                        <span class="text-stone-400">({{ product.review_count }} collector reviews)</span>
+                    </div>
+                </div>
+
+                <!-- Price & Stock -->
+                <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-serif text-3xl font-bold text-espresso">${{ product.price }}</span>
+                        {% if product.compare_at_price %}
+                        <span class="text-lg text-stone-400 line-through">${{ product.compare_at_price }}</span>
+                        <span class="text-xs font-semibold text-terracotta bg-terracotta/10 px-2 py-0.5 rounded-full">Save {{ product.discount_percent }}%</span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.stock > 0 %}
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> In Studio ({{ product.stock }} available)
+                    </span>
+                    {% else %}
+                    <span class="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full">
+                        Currently Firing in Kiln
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    {{ product.description }}
+                </p>
+
+                <!-- Order Action Form -->
+                <form action="{% url 'cart:cart_add' product.id %}" method="POST" class="space-y-4 pt-4 border-t border-stone-100">
+                    {% csrf_token %}
+                    
+                    <div class="flex items-center gap-4">
+                        <!-- Quantity Counter -->
+                        <div class="flex items-center border border-stone-200 rounded-full bg-sand/40 p-1">
+                            <button type="button" onclick="decrementQty()" class="w-8 h-8 rounded-full bg-white text-stone-600 flex items-center justify-center hover:bg-stone-100 text-xs shadow-sm">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <input type="number" name="quantity" id="quantity-input" value="1" min="1" max="{{ product.stock }}" 
+                                   class="w-12 text-center bg-transparent border-0 text-sm font-semibold focus:outline-none">
+                            <button type="button" onclick="incrementQty()" class="w-8 h-8 rounded-full bg-white text-stone-600 flex items-center justify-center hover:bg-stone-100 text-xs shadow-sm">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <!-- Add to Basket Button -->
+                        <button type="submit" class="btn-primary flex-grow py-3.5">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span>Add to Basket</span>
+                        </button>
+
+                        <!-- Wishlist Toggle -->
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'products:toggle_wishlist' product.id %}" 
+                           class="w-12 h-12 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:text-rose-500 hover:border-rose-300 transition-colors {% if is_wishlisted %}text-rose-500 border-rose-300 bg-rose-50{% endif %}"
+                           title="Add to Wishlist">
+                            <i class="fa-solid fa-heart text-base"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <!-- Shortcut to Unique Features -->
+                <div class="grid grid-cols-2 gap-3 pt-4 border-t border-stone-100 text-xs">
+                    <a href="{% url 'atelier:cozy_nook_builder' %}" class="p-3 bg-sand/60 hover:bg-sand rounded-xl border border-stone-200 text-stone-700 font-medium flex items-center gap-2 group">
+                        <i class="fa-solid fa-couch text-amber-700 group-hover:scale-110 transition-transform"></i>
+                        <span>Style in Room Canvas</span>
+                    </a>
+                    <a href="{% url 'atelier:studio' %}" class="p-3 bg-terracotta/10 hover:bg-terracotta/15 rounded-xl border border-terracotta/20 text-terracotta font-medium flex items-center gap-2 group">
+                        <i class="fa-solid fa-wand-magic-sparkles text-terracotta group-hover:scale-110 transition-transform"></i>
+                        <span>Custom Glaze Atelier</span>
+                    </a>
+                </div>
+
+                <!-- Artisanal Specifications Accordion -->
+                <div class="space-y-3 pt-4 border-t border-stone-100 text-xs text-stone-600">
+                    <div class="flex justify-between py-1.5 border-b border-stone-50">
+                        <span class="font-medium text-stone-400 uppercase">Material & Clay</span>
+                        <span class="text-espresso font-medium">{{ product.material }}</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-stone-50">
+                        <span class="font-medium text-stone-400 uppercase">Dimensions</span>
+                        <span class="text-espresso font-medium">{{ product.dimensions }}</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-stone-50">
+                        <span class="font-medium text-stone-400 uppercase">Weight</span>
+                        <span class="text-espresso font-medium">{{ product.weight }}</span>
+                    </div>
+                    <div class="flex justify-between py-1.5">
+                        <span class="font-medium text-stone-400 uppercase">Care</span>
+                        <span class="text-espresso text-right max-w-xs">{{ product.care_instructions }}</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Artisan Story Tab -->
+        {% if product.story %}
+        <div class="bg-white p-8 sm:p-12 rounded-2xl border border-stone-200 shadow-sm mb-16 max-w-4xl mx-auto">
+            <span class="text-xs font-bold text-terracotta tracking-wider uppercase block mb-1">Artisan Origin</span>
+            <h2 class="font-serif text-2xl sm:text-3xl text-espresso font-semibold mb-4">The Story Behind This Piece</h2>
+            <p class="text-stone-600 text-base leading-relaxed font-normal">
+                {{ product.story }}
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Customer Reviews Section -->
+        <div class="mb-20 max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="font-serif text-2xl sm:text-3xl text-espresso font-semibold">Collector Reviews</h2>
+                    <p class="text-xs text-stone-500 mt-1">Verified reflections from collectors living with this piece</p>
+                </div>
+                <button type="button" onclick="document.getElementById('review-form-container').classList.toggle('hidden')" class="btn-secondary btn-sm">
+                    <i class="fa-solid fa-pen-nib"></i>
+                    <span>Leave a Review</span>
+                </button>
+            </div>
+
+            <!-- Review Submission Form (Toggled) -->
+            <div id="review-form-container" class="hidden bg-white p-6 rounded-2xl border border-stone-200 shadow-sm mb-8">
+                <h3 class="font-serif text-xl font-semibold mb-4 text-espresso">Share Your Studio Experience</h3>
+                <form action="{% url 'products:submit_review' product.id %}" method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">Your Name</label>
+                            <input type="text" name="name" required class="form-input text-xs" 
+                                   value="{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% endif %}" placeholder="Elena V.">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">Rating</label>
+                            <select name="rating" class="form-select text-xs">
+                                <option value="5">★★★★★ (5 Stars - Exceptional)</option>
+                                <option value="4">★★★★☆ (4 Stars - Beautiful)</option>
+                                <option value="3">★★★☆☆ (3 Stars - Good)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Review Title</label>
+                        <input type="text" name="title" required class="form-input text-xs" placeholder="e.g. The warmest light on my desk">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Your Thoughts</label>
+                        <textarea name="comment" rows="3" required class="form-input text-xs" placeholder="Describe the texture, weight, or how it transforms your space..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-sm">Post Ceramic Review</button>
+                </form>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="space-y-4">
+                {% for review in reviews %}
+                <div class="bg-white p-6 rounded-xl border border-stone-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-espresso text-sm">{{ review.name }}</span>
+                            <span class="badge-pill bg-emerald-50 text-emerald-700 text-[10px]">Verified Collector</span>
+                        </div>
+                        <span class="text-xs text-stone-400">{{ review.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="flex items-center text-amber-500 text-xs mb-2">
+                        {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}
+                        <i class="fa-solid fa-star"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star text-stone-300"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <h4 class="font-serif font-semibold text-base text-espresso mb-1">{{ review.title }}</h4>
+                    <p class="text-stone-600 text-xs leading-relaxed italic">"{{ review.comment }}"</p>
+                </div>
+                {% empty %}
+                <div class="text-center py-10 bg-white rounded-xl border border-stone-100 text-stone-500 text-xs">
+                    Be the first collector to review this ceramic object.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Related Pieces -->
+        {% if related_products %}
+        <div>
+            <h2 class="font-serif text-2xl text-espresso font-semibold mb-6">Harmonious Companions</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for related in related_products %}
+                <div class="product-card group">
+                    <div class="card-image-wrap">
+                        {% if related.image %}
+                        <img src="{{ related.image.url }}" alt="{{ related.name }}" loading="lazy">
+                        {% endif %}
+                    </div>
+                    <div class="card-content">
+                        <span class="card-category">{{ related.category.name }}</span>
+                        <h4 class="card-title font-serif text-base">
+                            <a href="{{ related.get_absolute_url }}">{{ related.name }}</a>
+                        </h4>
+                        <div class="card-bottom">
+                            <span class="card-price text-sm">${{ related.price }}</span>
+                            <a href="{{ related.get_absolute_url }}" class="text-xs text-terracotta font-medium hover:underline">View</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function incrementQty() {
+        const input = document.getElementById('quantity-input');
+        const max = parseInt(input.getAttribute('max') || '99');
+        let val = parseInt(input.value || '1');
+        if (val < max) input.value = val + 1;
+    }
+
+    function decrementQty() {
+        const input = document.getElementById('quantity-input');
+        let val = parseInt(input.value || '1');
+        if (val > 1) input.value = val - 1;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Atelier Account | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="font-serif text-3xl sm:text-4xl text-espresso font-semibold">Welcome, {{ user.first_name|default:user.username }}</h1>
+                <p class="text-stone-500 text-sm mt-1">Manage your delivery destination, studio orders, and pottery collection.</p>
+            </div>
+            <a href="{% url 'accounts:logout' %}" class="btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left: Profile Settings Form -->
+            <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <h3 class="font-serif text-xl font-semibold text-espresso flex items-center gap-2">
+                    <i class="fa-regular fa-user text-terracotta text-base"></i>
+                    <span>Default Studio Profile</span>
+                </h3>
+
+                <form method="POST" action="{% url 'accounts:profile' %}" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Phone</label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Street Address</label>
+                        {{ form.street_address }}
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">State</label>
+                            {{ form.state }}
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-stone-600 block mb-1">Postal</label>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 text-xs">Save Profile Changes</button>
+                </form>
+            </div>
+
+            <!-- Right: Order History -->
+            <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-serif text-xl font-semibold text-espresso flex items-center gap-2">
+                        <i class="fa-solid fa-box-open text-terracotta text-base"></i>
+                        <span>Your Kiln & Studio Orders</span>
+                    </h3>
+                    <span class="text-xs text-stone-500">{{ orders.count }} Orders</span>
+                </div>
+
+                {% if orders %}
+                <div class="divide-y divide-stone-100">
+                    {% for order in orders %}
+                    <div class="py-4 first:pt-0 last:pb-0 space-y-3">
+                        <div class="flex items-center justify-between text-xs">
+                            <div>
+                                <span class="font-bold text-espresso">#{{ order.order_number }}</span>
+                                <span class="text-stone-400 ml-2">{{ order.created_at|date:"M j, Y" }}</span>
+                            </div>
+                            <span class="badge-pill badge-terracotta text-[10px]">{{ order.get_status_display }}</span>
+                        </div>
+
+                        <ul class="text-xs text-stone-600 space-y-1">
+                            {% for item in order.items.all %}
+                            <li class="flex justify-between">
+                                <span>{{ item.quantity }}x {{ item.item_name }}</span>
+                                <span class="font-medium text-espresso">${{ item.total_cost }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-stone-50 text-xs">
+                            <span class="font-semibold text-espresso">Total: ${{ order.total_price }}</span>
+                            <a href="{% url 'orders:order_confirmation' order.order_number %}" class="text-terracotta font-medium hover:underline">
+                                View Receipt <i class="fa-solid fa-chevron-right text-[10px] ml-0.5"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-10 text-stone-500 text-xs space-y-3">
+                    <i class="fa-solid fa-fire text-stone-300 text-2xl block"></i>
+                    <p>You haven't commissioned any ceramic pieces yet.</p>
+                    <a href="{% url 'products:product_list' %}" class="btn-secondary btn-sm">Explore Collection</a>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

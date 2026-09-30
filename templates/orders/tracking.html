@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Your Ceramic Order | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-16 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container max-w-3xl">
+        
+        <div class="text-center mb-10">
+            <span class="text-xs font-bold text-terracotta tracking-wider uppercase">Real-Time Studio Progress</span>
+            <h1 class="font-serif text-3xl sm:text-4xl text-espresso font-semibold mt-1">Track Kiln & Delivery</h1>
+            <p class="text-stone-500 text-sm mt-1 max-w-md mx-auto">
+                Check the exact stage of your ceramic piece from wet clay throwing to kiln firing and secure dispatch.
+            </p>
+        </div>
+
+        <!-- Tracking Search Card -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-sm mb-10">
+            <form method="GET" action="{% url 'orders:track_order' %}" class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div class="sm:col-span-5">
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Order Number</label>
+                    <input type="text" name="order_number" value="{{ order_number }}" placeholder="e.g. AT-202609-XXXX" required class="form-input text-xs uppercase">
+                </div>
+                <div class="sm:col-span-5">
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Email Address</label>
+                    <input type="email" name="email" value="{{ email }}" placeholder="your.email@example.com" required class="form-input text-xs">
+                </div>
+                <div class="sm:col-span-2 flex items-end">
+                    <button type="submit" class="btn-primary w-full py-3 text-xs">Track</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Display -->
+        {% if searched %}
+            {% if order %}
+            <div class="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-100 gap-2">
+                    <div>
+                        <span class="text-xs text-stone-400 font-semibold uppercase block">Order Reference</span>
+                        <h3 class="font-serif text-2xl font-bold text-espresso">#{{ order.order_number }}</h3>
+                    </div>
+                    <div class="text-right">
+                        <span class="badge-pill badge-terracotta text-xs">{{ order.get_status_display }}</span>
+                        <p class="text-[11px] text-stone-400 mt-1">Placed on {{ order.created_at|date:"F j, Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="py-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs mb-1">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span class="text-xs font-semibold">Confirmed</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs mb-1 animate-pulse">
+                                <i class="fa-solid fa-fire"></i>
+                            </div>
+                            <span class="text-xs font-semibold">1280°C Kiln</span>
+                        </div>
+                        <div class="flex flex-col items-center opacity-40">
+                            <div class="w-8 h-8 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center text-xs mb-1">
+                                <i class="fa-solid fa-box"></i>
+                            </div>
+                            <span class="text-xs font-semibold">Inspected</span>
+                        </div>
+                        <div class="flex flex-col items-center opacity-40">
+                            <div class="w-8 h-8 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center text-xs mb-1">
+                                <i class="fa-solid fa-truck"></i>
+                            </div>
+                            <span class="text-xs font-semibold">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items in order -->
+                <div class="pt-4 border-t border-stone-100">
+                    <span class="text-xs font-bold text-espresso uppercase block mb-3">Enclosed Pieces</span>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        {% for item in order.items.all %}
+                        <li class="flex justify-between py-1">
+                            <span>{{ item.quantity }}x {{ item.item_name }}</span>
+                            <span class="font-semibold text-espresso">${{ item.total_cost }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-2xl border border-stone-200 p-8">
+                <i class="fa-solid fa-circle-question text-stone-300 text-3xl mb-3 block"></i>
+                <h3 class="font-serif text-xl font-semibold text-espresso mb-1">Order Not Found</h3>
+                <p class="text-stone-500 text-xs max-w-sm mx-auto">
+                    Please double-check the order number and email address or check your inbox confirmation message.
+                </p>
+            </div>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

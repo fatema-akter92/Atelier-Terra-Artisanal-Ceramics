@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact & Bespoke Commissions | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-16 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container max-w-3xl">
+        
+        <div class="text-center mb-10">
+            <span class="badge-pill badge-terracotta text-xs uppercase mb-2">Connect With The Studio</span>
+            <h1 class="font-serif text-3xl sm:text-4xl text-espresso font-semibold mt-1">Bespoke Inquiries & Trade</h1>
+            <p class="text-stone-500 text-sm mt-1 max-w-md mx-auto">
+                Have a question about a glaze finish, custom interior order, or fragile packaging? We would love to hear from you.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 sm:p-12 border border-stone-200 shadow-sm space-y-6">
+            <form action="{% url 'core:contact' %}" method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Your Name *</label>
+                        <input type="text" name="name" required class="form-input text-xs" placeholder="e.g. Henrik Lindqvist">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Email Address *</label>
+                        <input type="email" name="email" required class="form-input text-xs" placeholder="your.email@example.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Subject</label>
+                    <input type="text" name="subject" class="form-input text-xs" placeholder="e.g. Bespoke restaurant tableware or lamp inquiry">
+                </div>
+
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Message *</label>
+                    <textarea name="message" rows="5" required class="form-input text-xs" placeholder="Tell us about your space, dimensions, or questions..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3.5 text-xs">
+                    <i class="fa-regular fa-paper-plane"></i>
+                    <span>Send Note to Workshop</span>
+                </button>
+            </form>
+
+            <div class="pt-6 border-t border-stone-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs text-stone-500">
+                <div>
+                    <i class="fa-solid fa-location-dot text-terracotta mb-1 block"></i>
+                    <span class="font-medium text-espresso">Main Atelier</span>
+                    <p class="text-[11px]">Portland, Oregon</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-clock text-terracotta mb-1 block"></i>
+                    <span class="font-medium text-espresso">Studio Response</span>
+                    <p class="text-[11px]">Within 24 Hours</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-envelope text-terracotta mb-1 block"></i>
+                    <span class="font-medium text-espresso">Direct Line</span>
+                    <p class="text-[11px]">hello@atelierterra.com</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

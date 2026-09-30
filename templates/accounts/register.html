@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account | Atelier Terra Ceramics{% endblock %}
+
+{% block content %}
+<div class="py-16 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container max-w-md">
+        
+        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-stone-200 shadow-sm space-y-6">
+            <div class="text-center">
+                <span class="badge-pill badge-terracotta text-xs mb-2">Join Atelier</span>
+                <h1 class="font-serif text-3xl text-espresso font-semibold">Join Our Circle</h1>
+                <p class="text-stone-500 text-xs mt-1">Save custom studio commissions, track kiln firings, and build your ceramic collection.</p>
+            </div>
+
+            <form method="POST" action="{% url 'accounts:register' %}" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Username *</label>
+                    {{ form.username }}
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-stone-600 block mb-1">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Email Address *</label>
+                    {{ form.email }}
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Password *</label>
+                    {{ form.password }}
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Confirm Password *</label>
+                    {{ form.password_confirm }}
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3 text-xs">
+                    <span>Create Atelier Account</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <div class="pt-4 border-t border-stone-100 text-center text-xs text-stone-500">
+                <span>Already have an account?</span>
+                <a href="{% url 'accounts:login' %}" class="text-terracotta font-semibold hover:underline ml-1">Sign In</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

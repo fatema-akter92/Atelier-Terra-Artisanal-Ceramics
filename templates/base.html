@@ -1,0 +1,248 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Atelier Terra | Japandi Ceramics & Cozy Home Living{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: {
+                            DEFAULT: '#C4704F',
+                            dark: '#AF5E3E',
+                            light: '#FAF3ED',
+                        },
+                        sand: '#F3EFE9',
+                        oatmeal: '#EAE3D7',
+                        espresso: '#2C2621',
+                        sage: '#7B8C7E',
+                        cream: '#FAF8F5',
+                    },
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Atelier Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/atelier.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-cream text-espresso antialiased min-h-screen flex flex-col">
+
+    <!-- Top Announcement Bar -->
+    <div class="announcement-bar">
+        <span><i class="fa-solid fa-leaf text-terracotta"></i> Spring Kiln Batch: Free Fragile Packaging on orders over $150</span>
+        <span class="hidden md:inline">|</span>
+        <span class="hidden md:inline"><i class="fa-solid fa-sparkles text-amber-400"></i> Use code <strong>WARMTH10</strong> for 10% off</span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="site-header">
+        <div class="atelier-container">
+            <div class="nav-wrapper">
+                <!-- Brand Identity -->
+                <a href="{% url 'core:home' %}" class="brand-logo group">
+                    <span class="logo-main group-hover:text-terracotta transition-colors">ATELIER TERRA</span>
+                    <span class="logo-sub">Artisanal Ceramics & Living</span>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:flex items-center nav-links">
+                    <a href="{% url 'core:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                    <a href="{% url 'products:product_list' %}" class="{% if 'products' in request.path %}active{% endif %}">Ceramic Collection</a>
+                    
+                    <!-- Unique Feature 1: The Custom Glaze Atelier -->
+                    <a href="{% url 'atelier:studio' %}" class="text-terracotta font-semibold flex items-center gap-1.5 {% if 'studio' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> Custom Studio
+                    </a>
+
+                    <!-- Unique Feature 2: Style My Cozy Nook -->
+                    <a href="{% url 'atelier:cozy_nook_builder' %}" class="text-amber-800 font-semibold flex items-center gap-1.5 {% if 'cozy-nook' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-couch text-xs"></i> Style My Nook
+                    </a>
+
+                    <a href="{% url 'core:artisan_story' %}" class="{% if request.resolver_match.url_name == 'artisan_story' %}active{% endif %}">Artisan Story</a>
+                    <a href="{% url 'orders:track_order' %}" class="{% if request.resolver_match.url_name == 'track_order' %}active{% endif %}">Track Order</a>
+                </nav>
+
+                <!-- Actions: Sign In & Basket ONLY -->
+                <div class="nav-actions">
+                    <!-- User Account / Wishlist / Sign In -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:wishlist' %}" class="action-btn" title="Saved Collection">
+                            <i class="fa-regular fa-heart text-stone-600"></i>
+                        </a>
+                        <a href="{% url 'accounts:profile' %}" class="action-btn" title="My Atelier Account">
+                            <i class="fa-regular fa-user text-stone-700"></i>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="action-btn text-xs" title="Sign In">
+                            <i class="fa-regular fa-user text-stone-600"></i>
+                            <span>Sign In</span>
+                        </a>
+                    {% endif %}
+
+                    <!-- Cart Drawer / Basket Button -->
+                    <a href="{% url 'cart:cart_detail' %}" class="action-btn bg-stone-900 text-white hover:bg-stone-800 border-stone-900 group" title="View Basket">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="font-medium">Basket</span>
+                        <span class="cart-indicator ml-1">{{ cart_item_count|default:"0" }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Quick Navigation Bar (Shown on small screens) -->
+    <div class="lg:hidden bg-sand/80 border-b border-stone-200 py-2.5 px-4 overflow-x-auto flex items-center justify-between text-xs space-x-4">
+        <a href="{% url 'products:product_list' %}" class="whitespace-nowrap font-medium text-stone-700 hover:text-terracotta">
+            <i class="fa-solid fa-shapes mr-1"></i> Shop All
+        </a>
+        <a href="{% url 'atelier:studio' %}" class="whitespace-nowrap font-semibold text-terracotta">
+            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Custom Studio
+        </a>
+        <a href="{% url 'atelier:cozy_nook_builder' %}" class="whitespace-nowrap font-semibold text-amber-800">
+            <i class="fa-solid fa-couch mr-1"></i> Room Styler
+        </a>
+        <a href="{% url 'core:artisan_story' %}" class="whitespace-nowrap text-stone-600">
+            <i class="fa-solid fa-book-open mr-1"></i> Story
+        </a>
+    </div>
+
+    <!-- Django Messages (Flash Alerts) -->
+    {% if messages %}
+    <div class="messages-container" id="toast-container">
+        {% for message in messages %}
+        <div class="toast-msg {{ message.tags }}">
+            <div class="flex items-center gap-3">
+                {% if 'success' in message.tags %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
+                {% elif 'error' in message.tags %}<i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+                {% else %}<i class="fa-solid fa-circle-info text-amber-400"></i>{% endif %}
+                <span class="text-sm font-medium">{{ message }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-stone-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content Block -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="atelier-container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand & Philosophy -->
+                <div>
+                    <h4 class="font-serif tracking-wide text-2xl mb-3 text-stone-100">ATELIER TERRA</h4>
+                    <p class="text-stone-400 text-sm leading-relaxed mb-6 max-w-sm">
+                        Rooted in Japandi simplicity and Scandinavian warmth. Every lamp, vase, and ceramic piece is born from earth, 
+                        fired at 1280°C, and finished by hands that honor patience.
+                    </p>
+                    <div class="flex items-center space-x-4 text-stone-400">
+                        <a href="#" class="hover:text-terracotta text-lg"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-terracotta text-lg"><i class="fa-brands fa-pinterest"></i></a>
+                        <a href="#" class="hover:text-terracotta text-lg"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Curated Collections -->
+                <div>
+                    <h4 class="font-serif text-lg text-stone-200 mb-4">Collections</h4>
+                    <ul class="space-y-2 text-sm text-stone-400">
+                        {% for cat in all_categories %}
+                        <li><a href="{% url 'products:product_list_by_category' cat.slug %}" class="hover:text-white transition-colors">{{ cat.name }}</a></li>
+                        {% endfor %}
+                        <li><a href="{% url 'products:product_list' %}" class="hover:text-white transition-colors">All Ceramic Objects</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Unique Atelier Features -->
+                <div>
+                    <h4 class="font-serif text-lg text-stone-200 mb-4">Interactive Studio</h4>
+                    <ul class="space-y-2 text-sm text-stone-400">
+                        <li>
+                            <a href="{% url 'atelier:studio' %}" class="text-terracotta hover:underline font-medium">
+                                <i class="fa-solid fa-palette text-xs mr-1"></i> Custom Glaze Atelier
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'atelier:cozy_nook_builder' %}" class="text-amber-400 hover:underline font-medium">
+                                <i class="fa-solid fa-couch text-xs mr-1"></i> Style My Cozy Nook
+                            </a>
+                        </li>
+                        <li><a href="{% url 'core:artisan_story' %}" class="hover:text-white transition-colors">The Kiln Firing Process</a></li>
+                        <li><a href="{% url 'orders:track_order' %}" class="hover:text-white transition-colors">Track Firing & Delivery</a></li>
+                        <li><a href="{% url 'core:contact' %}" class="hover:text-white transition-colors">Bespoke Commissions</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Newsletter & Clay Journal -->
+                <div>
+                    <h4 class="font-serif text-lg text-stone-200 mb-4">The Clay Journal</h4>
+                    <p class="text-xs text-stone-400 mb-4">
+                        Join our quiet circle. Receive notices of small-batch kiln releases, glaze recipes, and cozy home styling essays.
+                    </p>
+                    <form action="{% url 'core:newsletter_subscribe' %}" method="POST" class="space-y-2">
+                        {% csrf_token %}
+                        <div class="flex items-center">
+                            <input type="email" name="email" required placeholder="your.email@atelier.com" 
+                                   class="bg-stone-800 border border-stone-700 text-stone-200 px-3.5 py-2.5 rounded-l-md text-xs w-full focus:outline-none focus:border-terracotta">
+                            <button type="submit" class="bg-terracotta text-white px-4 py-2.5 rounded-r-md text-xs font-semibold hover:bg-terracotta-dark transition-colors">
+                                Join
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright & Safe Payment -->
+            <div class="footer-bottom">
+                <p>&copy; 2026 Atelier Terra Ceramics. Handcrafted with reverence for raw clay and gentle light.</p>
+                <div class="flex items-center gap-4 text-xs">
+                    <span><i class="fa-solid fa-shield-halved text-terracotta mr-1"></i> Fragile-Safe Guarantee</span>
+                    <span><i class="fa-solid fa-truck text-terracotta mr-1"></i> Carbon-Neutral Shipping</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script>
+        // Auto-dismiss toast messages after 5 seconds
+        setTimeout(() => {
+            const container = document.getElementById('toast-container');
+            if (container) {
+                container.style.opacity = '0';
+                container.style.transition = 'opacity 0.6s ease';
+                setTimeout(() => container.remove(), 600);
+            }
+        }, 5000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Saved Collection | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container">
+        
+        <div class="mb-8">
+            <h1 class="font-serif text-3xl sm:text-4xl text-espresso font-semibold">Your Saved Collection</h1>
+            <p class="text-stone-500 text-sm mt-1">Ceramic vessels, lamps, and wallmates curated for your future space.</p>
+        </div>
+
+        {% if wishlist %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for item in wishlist %}
+            <div class="product-card group">
+                <div class="card-image-wrap">
+                    <a href="{% url 'products:toggle_wishlist' item.product.id %}" class="card-wishlist-top wished" title="Remove from Wishlist">
+                        <i class="fa-solid fa-heart"></i>
+                    </a>
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    {% endif %}
+                </div>
+
+                <div class="card-content">
+                    <span class="card-category">{{ item.product.category.name }}</span>
+                    <h3 class="card-title font-serif text-lg">
+                        <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                    </h3>
+                    <div class="card-bottom">
+                        <span class="card-price">${{ item.product.price }}</span>
+                        <form action="{% url 'cart:cart_add' item.product.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-primary btn-sm py-1.5 px-3 text-xs">
+                                Add to Basket
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-2xl p-12 text-center border border-stone-200 max-w-lg mx-auto space-y-4">
+            <div class="w-16 h-16 rounded-full bg-sand text-stone-400 flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-regular fa-heart"></i>
+            </div>
+            <h3 class="font-serif text-2xl text-espresso font-semibold">Your collection is empty</h3>
+            <p class="text-stone-500 text-xs">Click the heart icon on any lamp, vase, or ceramic piece to save it here.</p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary btn-sm">Explore Collection</a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

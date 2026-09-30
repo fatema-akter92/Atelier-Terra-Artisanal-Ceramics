@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In | Atelier Terra Ceramics{% endblock %}
+
+{% block content %}
+<div class="py-16 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container max-w-md">
+        
+        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-stone-200 shadow-sm space-y-6">
+            <div class="text-center">
+                <span class="badge-pill badge-terracotta text-xs mb-2">Member Atelier</span>
+                <h1 class="font-serif text-3xl text-espresso font-semibold">Welcome Back</h1>
+                <p class="text-stone-500 text-xs mt-1">Sign in to access your bespoke orders, kiln status, and saved wishlist.</p>
+            </div>
+
+            <form method="POST" action="{% url 'accounts:login' %}" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="text-xs font-medium text-stone-600 block mb-1">Username</label>
+                    <input type="text" name="username" required class="form-input text-xs" placeholder="e.g. elena or admin">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-xs font-medium text-stone-600">Password</label>
+                    </div>
+                    <input type="password" name="password" required class="form-input text-xs" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3 text-xs">
+                    <span>Sign In to Atelier</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <div class="pt-4 border-t border-stone-100 text-center text-xs text-stone-500">
+                <span>New to our pottery collective?</span>
+                <a href="{% url 'accounts:register' %}" class="text-terracotta font-semibold hover:underline ml-1">Create an Account</a>
+            </div>
+
+            <div class="p-3 bg-sand/60 rounded-xl text-[11px] text-stone-500 text-center">
+                Demo Accounts: <strong>admin</strong> (pass: <code>admin123</code>) or <strong>elena</strong> (pass: <code>pottery123</code>)
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

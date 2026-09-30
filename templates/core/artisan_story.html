@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Artisan Story & Philosophy | Atelier Terra{% endblock %}
+
+{% block content %}
+<div class="py-16 bg-sand/30 border-b border-stone-200">
+    <div class="atelier-container max-w-4xl space-y-16">
+        
+        <!-- Header -->
+        <div class="text-center space-y-4">
+            <span class="badge-pill badge-terracotta text-xs uppercase tracking-widest">Studio Philosophy</span>
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-espresso font-semibold leading-tight">
+                Slow Craft in a Hurried World
+            </h1>
+            <p class="text-stone-500 text-base max-w-2xl mx-auto leading-relaxed">
+                Atelier Terra began with a simple yearning: to return to objects that ground us. 
+                Where Danish hygge meets Japanese wabi-sabi — finding profound beauty in organic asymmetry, 
+                quiet earth tones, and warm incandescent light.
+            </p>
+        </div>
+
+        <!-- Hero Feature Image Frame -->
+        <div class="rounded-3xl overflow-hidden shadow-2xl border border-stone-200 bg-white p-3">
+           <img src="/media/products/pic8.jpg" alt="Atelier Terra Studio Corner" class="w-full h-auto max-h-[600px] object-cover rounded-2xl">
+            <p class="text-center text-xs text-stone-400 py-3 italic">
+                Morning light in our studio: The Pleated Solstice Lamp, Oregon stoneware bud vase, and carved ceramic pencil cup.
+            </p>
+        </div>
+
+        <!-- 4 Pillars of Craft -->
+        <div class="space-y-12">
+            <h2 class="font-serif text-3xl text-espresso font-semibold text-center">The Journey of Each Piece</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+                    <span class="font-serif text-3xl font-bold text-terracotta">01</span>
+                    <h3 class="font-serif text-2xl font-semibold text-espresso">Earth & Clay Origin</h3>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        We blend high-iron Pacific stoneware with sandy alluvial river clays. 
+                        Each batch is wedged by hand to eliminate trapped air and align the clay platelets for structural integrity.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+                    <span class="font-serif text-3xl font-bold text-terracotta">02</span>
+                    <h3 class="font-serif text-2xl font-semibold text-espresso">Form & Pleated Shades</h3>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Every vase is wheel-thrown or coil-built in limited runs. Our signature lamp shades are creased by bone folder 
+                        from heavyweight mulberry rice paper, treated with natural non-toxic sealants to gently diffuse warm 2700K light.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+                    <span class="font-serif text-3xl font-bold text-terracotta">03</span>
+                    <h3 class="font-serif text-2xl font-semibold text-espresso">Artisanal Glaze Chemistry</h3>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        We avoid synthetic pigment pastes. Our glazes rely on natural wood ash, crushed feldspar, iron-rich basalt, 
+                        and plant minerals that melt into silky satin textures and unpredictable mineral speckles.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+                    <span class="font-serif text-3xl font-bold text-terracotta">04</span>
+                    <h3 class="font-serif text-2xl font-semibold text-espresso">Cone 10 (1280°C) Kiln Fire</h3>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Fired over 14 hours in our reduction kilns. The intense heat vitrifies the clay into dense, non-porous stoneware 
+                        that will outlive all of us — waterproof, enduring, and imbued with quiet character.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action Banner -->
+        <div class="bg-stone-900 text-white rounded-3xl p-10 sm:p-12 text-center space-y-6">
+            <h2 class="font-serif text-3xl sm:text-4xl font-medium">Create a Piece With Us</h2>
+            <p class="text-stone-400 text-sm max-w-lg mx-auto">
+                Step into our interactive studio to select your custom silhouette, blend your glaze formulation, 
+                and add your personal maker's inscription.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="{% url 'atelier:studio' %}" class="btn-primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Enter Custom Studio</span>
+                </a>
+                <a href="{% url 'products:product_list' %}" class="btn-secondary text-white border-stone-600 hover:border-white">
+                    <span>Browse Ready Pieces</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
